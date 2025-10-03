@@ -6,11 +6,18 @@ from typing import Dict, List, Optional, Any, Set
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import logging
 from dataclasses import dataclass
+import sys
+from pathlib import Path
 
-from .base import VehicleDataSource, VehicleListing
-from .cars_com import CarsDotComAPI
-from .autotrader import AutoTraderAPI
-from .cargurus import CarGurusAPI
+# Add app directory to path for imports
+app_dir = Path(__file__).parent.parent
+if str(app_dir) not in sys.path:
+    sys.path.insert(0, str(app_dir))
+
+from data_sources.base import VehicleDataSource, VehicleListing
+from data_sources.cars_com import CarsDotComAPI
+from data_sources.autotrader import AutoTraderAPI
+from data_sources.cargurus import CarGurusAPI
 
 logger = logging.getLogger(__name__)
 

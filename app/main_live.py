@@ -14,13 +14,15 @@ sys.path.insert(0, str(app_dir))
 try:
     from utils.config import load_config
     from models.database import DatabaseManager
-    from services.vehicle_data import VehicleDataService
     from utils.simple_rag import SimpleRAG
     from agents.conversation import ConversationState
     import json
     import re
     from datetime import datetime
     import logging
+    
+    # Import vehicle data service with fixed imports
+    from services.vehicle_data import VehicleDataService
     
     # Configure logging
     logging.basicConfig(level=logging.INFO)
@@ -33,7 +35,7 @@ except ImportError as e:
 class CarFinderAI:
     def __init__(self):
         self.config = load_config()
-        self.db_manager = DatabaseManager(self.config)
+        self.db_manager = DatabaseManager(f"sqlite:///{self.config['database_path']}")
         self.vehicle_service = VehicleDataService()
         self.rag = SimpleRAG(self.db_manager)
         

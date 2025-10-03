@@ -2,16 +2,16 @@
 from typing import Dict, List, Any, Optional
 import json
 import requests
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class ConversationState:
     """State of the conversation."""
-    user_preferences: Dict[str, Any]
-    clarified_needs: Dict[str, Any]
-    search_performed: bool
-    recommendations_shown: bool
-    conversation_history: List[Dict[str, str]]
+    user_preferences: Dict[str, Any] = field(default_factory=dict)
+    clarified_needs: Dict[str, Any] = field(default_factory=dict)
+    search_performed: bool = False
+    recommendations_shown: bool = False
+    conversation_history: List[Dict[str, str]] = field(default_factory=list)
 
 class ConversationAgent:
     """AI agent for conversational car shopping."""

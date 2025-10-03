@@ -3,8 +3,16 @@ CarGurus API integration for real-time vehicle listings.
 """
 
 from typing import Dict, List, Optional, Any
-from .base import VehicleDataSource, VehicleListing
 import logging
+import sys
+from pathlib import Path
+
+# Add app directory to path
+app_dir = Path(__file__).parent.parent
+if str(app_dir) not in sys.path:
+    sys.path.insert(0, str(app_dir))
+
+from data_sources.base import VehicleDataSource, VehicleListing
 
 logger = logging.getLogger(__name__)
 

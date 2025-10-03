@@ -7,10 +7,18 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime, timedelta
 import logging
 
-from ..models.database import DatabaseManager, Vehicle
-from ..utils.config import load_config
-from ..data_sources.aggregator import VehicleDataAggregator, SearchCriteria
-from ..data_sources.base import VehicleListing
+import sys
+from pathlib import Path
+
+# Add app directory to path for absolute imports
+app_dir = Path(__file__).parent.parent
+if str(app_dir) not in sys.path:
+    sys.path.insert(0, str(app_dir))
+
+from models.database import DatabaseManager, Vehicle
+from utils.config import load_config
+from data_sources.aggregator import VehicleDataAggregator, SearchCriteria
+from data_sources.base import VehicleListing
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +30,7 @@ class VehicleDataService:
     
     def __init__(self):
         self.config = load_config()
-        self.db_manager = DatabaseManager(self.config)
+        self.db_manager = DatabaseManager(f"sqlite:///{self.config['database_path']}")
         self.aggregator = VehicleDataAggregator(self.config)
         self.cache_duration = timedelta(hours=2)  # Cache live data for 2 hours
         
@@ -69,11 +77,11 @@ class VehicleDataService:
         vehicles = self.db_manager.search_vehicles(
             make=preferences.get('make'),
             model=preferences.get('model'),
-            year_min=preferences.get('year_min'),
-            year_max=preferences.get('year_max'),
-            price_min=preferences.get('price_min'),
-            price_max=preferences.get('budget_max'),
-            mileage_max=preferences.get('mileage_max'),
+            min_year=preferences.get('year_min'),
+            max_year=preferences.get('year_max'),
+            min_price=preferences.get('price_min'),
+            max_price=preferences.get('budget_max'),
+            max_mileage=preferences.get('mileage_max'),
             fuel_type=preferences.get('fuel_type'),
             limit=50
         )
