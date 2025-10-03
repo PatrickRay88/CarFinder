@@ -1,6 +1,34 @@
 # CarFinder - GenAI Car Shopping Assistant
 
-A Streamlit-based AI-powered car shopping assistant that uses RAG (Retrieval-Augmented Generation) to help users find their perfect vehicle match.
+# 🚗 CarFinder - AI-Powered Car Shopping Assistant
+
+A complete GenAI car shopping assistant built with Streamlit, featuring RAG-powered search, intelligent recommendations, and conversational AI interface.
+
+![Python](https://img.shields.io/badge/python-v3.8+-blue.svg)
+![Streamlit](https://img.shields.io/badge/streamlit-v1.50+-red.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
+## ✨ Features
+
+### 🤖 **AI-First Experience**
+- **Natural Language Search**: Describe what you want instead of filling forms
+- **Conversational Interface**: Chat with AI to refine and explore options
+- **Contextual Understanding**: AI extracts preferences from casual conversation
+
+### 🎯 **Intelligent Recommendations**
+- **RAG-Powered Search**: Semantic vehicle matching using custom RAG implementation
+- **Multi-Objective Scoring**: Considers price, reliability, fuel efficiency, safety, and features
+- **Personalized Ranking**: AI learns from your preferences and priorities
+
+### 🎨 **Beautiful Interface**
+- **Card-Based Layout**: Clean, modern vehicle display cards
+- **Prominent Top Choice**: AI's #1 recommendation gets prime visual real estate
+- **Smart Metrics**: Context-aware data presentation with savings indicators
+
+### 🔧 **Robust Architecture**
+- **Fallback-Friendly**: Graceful degradation when advanced features unavailable
+- **Local Processing**: No external API dependencies for core functionality
+- **SQLite Database**: Lightweight, embedded database with sample vehicle data
 
 ## Features
 
