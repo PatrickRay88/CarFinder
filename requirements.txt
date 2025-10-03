@@ -1,0 +1,43 @@
+# Core Framework
+streamlit>=1.28.0
+fastapi>=0.104.0
+uvicorn>=0.24.0
+
+# Database
+sqlalchemy>=2.0.0
+
+# AI/ML Core
+sentence-transformers>=2.2.2
+transformers>=4.35.0
+torch>=2.1.0
+numpy>=1.24.0
+pandas>=2.1.0
+
+# Vector Search
+faiss-cpu>=1.7.4
+chromadb>=0.4.15
+
+# LLM Integration
+ollama>=0.1.7
+langchain>=0.0.325
+langgraph>=0.0.62
+langchain-community>=0.0.37
+
+# UI Components
+plotly>=5.17.0
+altair>=5.1.0
+
+# Utilities
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+requests>=2.31.0
+httpx>=0.25.0
+
+# Development/Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.9.0
+flake8>=6.1.0
+
+# Optional: Reranking
+rank-bm25>=0.2.2

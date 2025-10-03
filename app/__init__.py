@@ -1,0 +1,1 @@
+"""CarFinder - AI-powered car shopping assistant."""
