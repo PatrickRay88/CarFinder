@@ -36,6 +36,15 @@ def load_config() -> Dict[str, Any]:
         "openai_api_key": os.getenv("OPENAI_API_KEY"),
         "anthropic_api_key": os.getenv("ANTHROPIC_API_KEY"),
         
+        # Vehicle Data APIs
+        "autotrader_api_key": os.getenv("AUTOTRADER_API_KEY"),
+        "cargurus_api_key": os.getenv("CARGURUS_API_KEY"),
+        "cars_com_rate_limit": int(os.getenv("CARS_COM_RATE_LIMIT", "1")),
+        "enable_live_data": os.getenv("ENABLE_LIVE_DATA", "true").lower() == "true",
+        "cache_duration_hours": int(os.getenv("CACHE_DURATION_HOURS", "2")),
+        "max_results_per_source": int(os.getenv("MAX_RESULTS_PER_SOURCE", "10")),
+        "default_search_radius": int(os.getenv("DEFAULT_SEARCH_RADIUS", "50")),
+        
         # Logging
         "log_level": os.getenv("LOG_LEVEL", "INFO"),
         "log_file": os.getenv("LOG_FILE", "logs/carfinder.log"),

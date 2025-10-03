@@ -156,11 +156,20 @@ CarFinder/
 3. The agent will ask clarifying questions to refine your search
 4. Get personalized recommendations with detailed explanations
 
-### Advanced Features
-- **VIN Lookup**: Check for recalls and detailed vehicle history
-- **TCO Calculator**: Compare total ownership costs over time
-- **Dealer Proximity**: Find nearby dealers for test drives
-- **Comparison Tool**: Side-by-side vehicle comparisons
+### Current Features
+- **Comparison Tool**: Side-by-side vehicle comparisons with detailed metrics
+- **Smart Recommendations**: AI-powered vehicle curation based on preferences
+- **Conversational Interface**: Natural language car shopping assistant
+- **Multi-objective Scoring**: Considers price, reliability, fuel efficiency, safety, and features
+
+### Future Improvements
+- **Live Vehicle Data**: Real-time integration with multiple vehicle listing APIs (Cars.com, AutoTrader, CarGurus, etc.)
+- **VIN Lookup**: NHTSA recall checks and detailed vehicle history reports
+- **TCO Calculator**: Comprehensive total cost of ownership analysis including maintenance, insurance, and depreciation
+- **Dealer Integration**: Find nearby dealers, schedule test drives, and get contact information
+- **Enhanced AI**: Ollama integration for more sophisticated conversational capabilities
+- **Market Analytics**: Price trend analysis and market value predictions
+- **Mobile Optimization**: Progressive Web App (PWA) support for mobile devices
 
 ## Configuration
 

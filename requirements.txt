@@ -27,6 +27,12 @@ langchain-community>=0.0.37
 plotly>=5.17.0
 altair>=5.1.0
 
+# Vehicle Data APIs
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+selenium>=4.15.0  # For advanced web scraping if needed
+
 # Utilities
 python-dotenv>=1.0.0
 pydantic>=2.5.0
