@@ -162,11 +162,19 @@ Always be conversational, friendly, and ask clarifying questions to better under
             except ValueError:
                 pass
         
-        # Extract vehicle type mentions
-        vehicle_types = ['sedan', 'suv', 'truck', 'coupe', 'hatchback', 'wagon']
-        for vtype in vehicle_types:
-            if vtype in message_lower:
-                response['extracted_preferences']['vehicle_type'] = vtype
+        # Extract vehicle type mentions - improved detection
+        vehicle_type_keywords = {
+            'truck': ['truck', 'pickup', 'pickup truck', 'pick-up', 'f-150', 'silverado', 'ram', 'tacoma', 'tundra', 'sierra'],
+            'suv': ['suv', 'sport utility', 'crossover', 'suburban', 'tahoe', 'explorer', 'pilot', 'highlander'],
+            'sedan': ['sedan', 'car', 'four-door', '4-door'],
+            'coupe': ['coupe', 'two-door', '2-door', 'sports car'],
+            'hatchback': ['hatchback', 'hatch'],
+            'wagon': ['wagon', 'estate']
+        }
+        
+        for vehicle_type, keywords in vehicle_type_keywords.items():
+            if any(keyword in message_lower for keyword in keywords):
+                response['extracted_preferences']['vehicle_type'] = vehicle_type
                 break
         
         # Determine if search should be triggered
@@ -265,6 +273,27 @@ Always be conversational, friendly, and ask clarifying questions to better under
             except ValueError:
                 pass
         
+        # Extract mileage requirements
+        mileage_patterns = [
+            r'less than ([0-9,]+) miles',
+            r'under ([0-9,]+) miles', 
+            r'below ([0-9,]+) miles',
+            r'maximum ([0-9,]+) miles',
+            r'max ([0-9,]+) miles',
+            r'([0-9,]+) miles or less',
+            r'([0-9,]+) miles maximum'
+        ]
+        
+        for pattern in mileage_patterns:
+            mileage_matches = re.findall(pattern, user_text)
+            if mileage_matches:
+                try:
+                    mileage = int(mileage_matches[-1].replace(',', ''))  # Take the last mentioned
+                    preferences['mileage_max'] = mileage
+                    break
+                except ValueError:
+                    pass
+        
         # Extract make preferences
         makes = ['toyota', 'honda', 'ford', 'chevrolet', 'bmw', 'mercedes', 'audi']
         for make in makes:
@@ -278,6 +307,46 @@ Always be conversational, friendly, and ask clarifying questions to better under
                 preferences['fuel_type'] = 'Electric'
             else:
                 preferences['fuel_type'] = 'Hybrid'
+        
+        # Extract vehicle type from conversation history
+        vehicle_type_keywords = {
+            'truck': ['truck', 'pickup', 'pickup truck', 'pick-up', 'f-150', 'silverado', 'ram', 'tacoma', 'tundra', 'sierra'],
+            'suv': ['suv', 'sport utility', 'crossover', 'suburban', 'tahoe', 'explorer', 'pilot', 'highlander'],
+            'sedan': ['sedan', 'car', 'four-door', '4-door'],
+            'coupe': ['coupe', 'two-door', '2-door', 'sports car'],
+            'hatchback': ['hatchback', 'hatch'],
+            'wagon': ['wagon', 'estate']
+        }
+        
+        for vehicle_type, keywords in vehicle_type_keywords.items():
+            if any(keyword in user_text for keyword in keywords):
+                preferences['vehicle_type'] = vehicle_type
+                break
+        
+        # Extract truck class/size (1500, 2500, 3500) for specific model filtering
+        truck_class_patterns = [
+            r'\b(1500|2500|3500)\b',
+            r'is a (1500|2500|3500)',
+            r'(f-150|f-250|f-350)',
+            r'(silverado 1500|silverado 2500|silverado 3500)',
+            r'(sierra 1500|sierra 2500|sierra 3500)',
+            r'(ram 1500|ram 2500|ram 3500)'
+        ]
+        
+        for pattern in truck_class_patterns:
+            matches = re.findall(pattern, user_text, re.IGNORECASE)
+            if matches:
+                class_match = matches[-1].lower()  # Take the last mentioned
+                if class_match in ['1500', '2500', '3500']:
+                    preferences['truck_class'] = class_match
+                elif 'f-' in class_match:
+                    preferences['truck_class'] = class_match.replace('f-', '').replace('f', '')
+                elif any(x in class_match for x in ['silverado', 'sierra', 'ram']):
+                    # Extract the numeric part
+                    class_num = re.findall(r'(1500|2500|3500)', class_match)
+                    if class_num:
+                        preferences['truck_class'] = class_num[0]
+                break
         
         # Extract features
         features = []

@@ -4,8 +4,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 from typing import Dict, Any
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from project root
+project_root = Path(__file__).parent.parent.parent
+env_path = project_root / ".env"
+load_dotenv(env_path)
 
 def load_config() -> Dict[str, Any]:
     """Load application configuration from environment variables."""
@@ -37,12 +39,13 @@ def load_config() -> Dict[str, Any]:
         "anthropic_api_key": os.getenv("ANTHROPIC_API_KEY"),
         
         # Vehicle Data APIs
+        "auto_dev_api_key": os.getenv("AUTO_DEV_API_KEY"),
         "autotrader_api_key": os.getenv("AUTOTRADER_API_KEY"),
         "cargurus_api_key": os.getenv("CARGURUS_API_KEY"),
         "cars_com_rate_limit": int(os.getenv("CARS_COM_RATE_LIMIT", "1")),
         "enable_live_data": os.getenv("ENABLE_LIVE_DATA", "true").lower() == "true",
         "cache_duration_hours": int(os.getenv("CACHE_DURATION_HOURS", "2")),
-        "max_results_per_source": int(os.getenv("MAX_RESULTS_PER_SOURCE", "10")),
+        "max_results_per_source": int(os.getenv("MAX_RESULTS_PER_SOURCE", "20")),
         "default_search_radius": int(os.getenv("DEFAULT_SEARCH_RADIUS", "50")),
         
         # Logging

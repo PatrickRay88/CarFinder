@@ -18,6 +18,7 @@ from data_sources.base import VehicleDataSource, VehicleListing
 from data_sources.cars_com import CarsDotComAPI
 from data_sources.autotrader import AutoTraderAPI
 from data_sources.cargurus import CarGurusAPI
+from data_sources.auto_dev import AutoDevAPI
 
 logger = logging.getLogger(__name__)
 
@@ -50,28 +51,47 @@ class VehicleDataAggregator:
         
     def _initialize_sources(self):
         """Initialize all available data sources."""
-        try:
-            # Cars.com (free/scraping)
-            self.sources.append(CarsDotComAPI())
-            logger.info("Initialized Cars.com data source")
-        except Exception as e:
-            logger.warning(f"Failed to initialize Cars.com: {e}")
+        # Check if Auto.dev API key is available
+        auto_dev_key = self.config.get('auto_dev_api_key')
+        
+        if auto_dev_key:
+            try:
+                # Use Auto.dev for live data
+                auto_dev_source = AutoDevAPI(api_key=auto_dev_key)
+                if auto_dev_source.test_connection():
+                    self.sources.append(auto_dev_source)
+                    logger.info("Initialized Auto.dev API data source")
+                else:
+                    logger.error("Auto.dev API connection test failed")
+            except Exception as e:
+                logger.error(f"Failed to initialize Auto.dev API: {e}")
+        
+        # Fallback to mock sources if Auto.dev is not available
+        if not self.sources:
+            logger.info("Auto.dev not available, using mock data sources")
             
-        try:
-            # AutoTrader (requires API key)
-            api_key = self.config.get('autotrader_api_key')
-            self.sources.append(AutoTraderAPI(api_key=api_key))
-            logger.info("Initialized AutoTrader data source")
-        except Exception as e:
-            logger.warning(f"Failed to initialize AutoTrader: {e}")
-            
-        try:
-            # CarGurus (requires API key)
-            api_key = self.config.get('cargurus_api_key')
-            self.sources.append(CarGurusAPI(api_key=api_key))
-            logger.info("Initialized CarGurus data source")
-        except Exception as e:
-            logger.warning(f"Failed to initialize CarGurus: {e}")
+            try:
+                # Cars.com (mock implementation)
+                self.sources.append(CarsDotComAPI())
+                logger.info("Initialized Cars.com mock data source")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Cars.com: {e}")
+                
+            try:
+                # AutoTrader (mock implementation)
+                api_key = self.config.get('autotrader_api_key')
+                self.sources.append(AutoTraderAPI(api_key=api_key))
+                logger.info("Initialized AutoTrader mock data source")
+            except Exception as e:
+                logger.warning(f"Failed to initialize AutoTrader: {e}")
+                
+            try:
+                # CarGurus (mock implementation)
+                api_key = self.config.get('cargurus_api_key')
+                self.sources.append(CarGurusAPI(api_key=api_key))
+                logger.info("Initialized CarGurus mock data source")
+            except Exception as e:
+                logger.warning(f"Failed to initialize CarGurus: {e}")
     
     def search_all_sources(self, criteria: SearchCriteria) -> List[VehicleListing]:
         """

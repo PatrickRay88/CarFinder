@@ -12,10 +12,10 @@ app_dir = Path(__file__).parent
 sys.path.insert(0, str(app_dir))
 
 try:
-    from utils.config import load_config
+    from utils.config import load_config, get_database_url
     from models.database import DatabaseManager
     from utils.simple_rag import SimpleRAG
-    from agents.conversation import ConversationState
+    from agents.conversation import ConversationState, ConversationAgent
     import json
     import re
     from datetime import datetime
@@ -35,9 +35,12 @@ except ImportError as e:
 class CarFinderAI:
     def __init__(self):
         self.config = load_config()
-        self.db_manager = DatabaseManager(f"sqlite:///{self.config['database_path']}")
+        database_url = get_database_url(self.config)
+        self.db_manager = DatabaseManager(database_url)
+        self.db_manager.init_database()  # Initialize database tables
         self.vehicle_service = VehicleDataService()
         self.rag = SimpleRAG(self.db_manager)
+        self.conversation_agent = ConversationAgent(self.config)
         
         # Initialize session state
         if 'chat_history' not in st.session_state:
@@ -47,7 +50,7 @@ class CarFinderAI:
         if 'preferences' not in st.session_state:
             st.session_state.preferences = {}
         if 'use_live_data' not in st.session_state:
-            st.session_state.use_live_data = self.config.get('enable_live_data', True)
+            st.session_state.use_live_data = True  # Enable live data for real-time listings
     
     def render_header(self):
         """Render the application header with live data toggle."""
@@ -68,6 +71,12 @@ class CarFinderAI:
             if use_live != st.session_state.use_live_data:
                 st.session_state.use_live_data = use_live
                 st.rerun()
+            
+            # Show current mode
+            if st.session_state.use_live_data:
+                st.caption("🟢 Auto.dev API Active")
+            else:
+                st.caption("🔵 Local Database Only")
     
     def show_data_source_status(self):
         """Show data source status in a modal-like display."""
@@ -153,6 +162,31 @@ class CarFinderAI:
         # Extract mileage preferences
         if any(word in text for word in ['low mileage', 'few miles', 'barely driven']):
             preferences['mileage_max'] = 30000
+            
+        # Extract specific mileage numbers
+        mileage_match = re.search(r'under\s+(\d+(?:,\d+)*)\s*miles', text)
+        if mileage_match:
+            mileage_str = mileage_match.group(1).replace(',', '')
+            preferences['mileage_max'] = int(mileage_str)
+        
+        # Extract vehicle type (CRITICAL for truck detection)
+        vehicle_type_keywords = {
+            'truck': ['truck', 'pickup', 'pickup truck', 'pick-up', 'f-150', 'silverado', 'ram', 'tacoma', 'tundra', 'sierra'],
+            'suv': ['suv', 'sport utility', 'crossover', 'suburban', 'tahoe', 'explorer', 'pilot', 'highlander'],
+            'sedan': ['sedan', 'car', 'four-door', '4-door'],
+            'coupe': ['coupe', 'two-door', '2-door', 'sports car'],
+            'hatchback': ['hatchback', 'hatch'],
+            'wagon': ['wagon', 'estate']
+        }
+        
+        for vehicle_type, keywords in vehicle_type_keywords.items():
+            if any(keyword in text for keyword in keywords):
+                preferences['vehicle_type'] = vehicle_type
+                break
+        
+        # Debug logging
+        if preferences:
+            logger.info(f"Extracted preferences: {preferences}")
         
         return preferences
     
@@ -182,6 +216,38 @@ class CarFinderAI:
                 budget_efficiency = 1 - (vehicle['price'] / preferences['budget_max'])
                 score += budget_efficiency * 30
         
+        # Vehicle type preference (25 points) - CRITICAL for truck vs sedan distinction
+        if preferences.get('vehicle_type'):
+            vehicle_type_requested = preferences['vehicle_type'].lower()
+            vehicle_make = vehicle.get('make', '').lower()
+            vehicle_model = vehicle.get('model', '').lower()
+            
+            # Check if vehicle matches requested type
+            if vehicle_type_requested == 'truck':
+                # Only truck-exclusive makes (Ram only makes trucks)
+                truck_only_makes = ['ram']  
+                # Truck-specific model keywords
+                truck_models = ['f-150', 'f150', 'silverado', 'sierra', 'tacoma', 'tundra', 'ram', 'frontier', 'ranger', 'colorado', 'canyon', 'ridgeline', 'truck']
+                
+                # Check for truck-only makes OR truck-specific model keywords
+                make_match = vehicle_make in truck_only_makes
+                model_match = any(model in vehicle_model for model in truck_models)
+                
+                if make_match or model_match:
+                    score += 25  # Big bonus for being the right vehicle type
+                else:
+                    score -= 15  # Penalty for being wrong vehicle type (sedan when asking for truck)
+            elif vehicle_type_requested == 'suv':
+                suv_models = ['suburban', 'tahoe', 'explorer', 'pilot', 'highlander', 'cr-v', 'rav4', 'escape', 'edge']
+                if any(model in vehicle_model for model in suv_models):
+                    score += 25
+                else:
+                    score -= 10
+        
+        # Log vehicle type matches for monitoring
+        if preferences.get('vehicle_type') and score > 20:  # Only log high-scoring matches
+            logger.info(f"High match: {preferences['vehicle_type']} preference → {vehicle.get('make')} {vehicle.get('model')} (Score: {score:.1f})")
+        
         # Make preference (20 points)
         if preferences.get('make') and vehicle.get('make'):
             if vehicle['make'].lower() == preferences['make'].lower():
@@ -208,6 +274,27 @@ class CarFinderAI:
         # Safety rating bonus (10 points)
         if vehicle.get('safety_rating'):
             score += (vehicle['safety_rating'] / 5) * 10
+        
+        # Data completeness penalty - penalize vehicles with missing critical data
+        missing_data_penalty = 0
+        critical_fields = ['mileage', 'mpg_city', 'mpg_highway', 'year']
+        
+        for field in critical_fields:
+            if not vehicle.get(field):
+                missing_data_penalty += 10  # 10 point penalty per missing field (stricter)
+        
+        # Additional penalty for vehicles missing multiple critical fields
+        missing_count = sum(1 for field in critical_fields if not vehicle.get(field))
+        if missing_count >= 3:
+            missing_data_penalty += 15  # Extra penalty for very incomplete data
+        
+        # Apply penalty but don't let score go below 0
+        score = max(0, score - missing_data_penalty)
+        
+        # Log data completeness issues for high-scoring but incomplete vehicles
+        if missing_data_penalty > 0:  # Log all vehicles with missing data
+            missing_fields = [field for field in critical_fields if not vehicle.get(field)]
+            logger.info(f"Data completeness check: {vehicle.get('make')} {vehicle.get('model')} - Missing: {missing_fields} (Penalty: -{missing_data_penalty}, Final Score: {score:.1f})")
         
         return min(score, max_score)
     
@@ -252,7 +339,7 @@ class CarFinderAI:
             with col2:
                 # Show data source
                 source = vehicle.get('source', 'local')
-                if source in ['cars.com', 'autotrader', 'cargurus']:
+                if source in ['cars.com', 'autotrader', 'cargurus', 'auto.dev']:
                     st.markdown("**🌐 LIVE**")
                     st.caption(f"from {source}")
                 else:
@@ -334,8 +421,20 @@ class CarFinderAI:
     
     def process_message(self, user_input: str):
         """Process user message and generate AI response with vehicle recommendations."""
-        # Extract preferences from the input
-        new_preferences = self.extract_preferences_from_text(user_input)
+        # Use conversation agent for intelligent preference extraction
+        agent_response = self.conversation_agent.process_message(user_input, st.session_state.conversation)
+        
+        # Extract preferences from conversation agent
+        agent_preferences = agent_response.get('extracted_preferences', {})
+        conversation_preferences = self.conversation_agent.extract_preferences_from_conversation(
+            st.session_state.conversation.conversation_history
+        )
+        
+        # Also use the basic extraction as fallback
+        basic_preferences = self.extract_preferences_from_text(user_input)
+        
+        # Combine all preference sources (conversation agent takes priority)
+        new_preferences = {**basic_preferences, **agent_preferences, **conversation_preferences}
         
         # Update stored preferences
         st.session_state.preferences.update(new_preferences)
@@ -362,8 +461,27 @@ class CarFinderAI:
                     ai_score = self.calculate_ai_score(vehicle, preferences)
                     scored_results.append((vehicle, ai_score))
                 
+                # Filter out vehicles with very low scores (less than 5% compatibility)
+                # These are likely vehicles with missing data or wrong type
+                min_score_threshold = 5.0
+                original_count = len(scored_results)
+                scored_results = [(vehicle, score) for vehicle, score in scored_results if score >= min_score_threshold]
+                filtered_count = original_count - len(scored_results)
+                
+                if filtered_count > 0:
+                    logger.info(f"Filtered out {filtered_count} vehicles with scores below {min_score_threshold}% (likely incomplete data)")
+                
                 # Sort by AI score
                 scored_results.sort(key=lambda x: x[1], reverse=True)
+                
+                if not scored_results:
+                    response = "❌ **I found vehicles matching your search criteria, but they all had incomplete data (missing mileage, MPG, etc.) so I filtered them out for quality.**\n\n"
+                    response += "💡 **Try:**\n"
+                    response += "- Adjusting your search criteria\n"
+                    response += "- Looking for different makes/models\n"
+                    response += "- Expanding your budget or mileage range\n\n"
+                    response += "The live data sources sometimes have incomplete listings - this filtering protects you from making decisions without key information!"
+                    return response, []
                 
                 # Generate contextual response
                 top_vehicle = scored_results[0][0]
@@ -375,7 +493,11 @@ class CarFinderAI:
                     if live_count > 0:
                         data_source_info = f" I found {live_count} live listings from current market data!"
                 
-                response = f"🎯 **Perfect! I found {len(search_results)} vehicles matching your criteria.{data_source_info}**\n\n"
+                quality_info = ""
+                if filtered_count > 0:
+                    quality_info = f" (filtered out {filtered_count} with incomplete data for quality)"
+                
+                response = f"🎯 **Perfect! I found {len(scored_results)} high-quality vehicles matching your criteria{quality_info}.{data_source_info}**\n\n"
                 response += f"**🏆 My #1 recommendation** is the **{top_vehicle.get('year')} {top_vehicle.get('make')} {top_vehicle.get('model')}** "
                 response += f"with a {top_score:.0f}% AI compatibility match!\n\n"
                 
@@ -429,14 +551,19 @@ class CarFinderAI:
             response += "• Any specific features you want\n\n"
             response += "*For example: 'I need a reliable SUV under $30,000 for family trips' or 'Looking for a fuel-efficient car around $25k'*"
         
+        # Ensure we always have a valid vehicles list for return
+        final_vehicles = []
+        if 'scored_results' in locals() and scored_results:
+            final_vehicles = scored_results
+        
         # Add response to chat history
         st.session_state.chat_history.append({
             'assistant': response,
             'timestamp': datetime.now().strftime('%H:%M'),
-            'vehicles': scored_results if 'scored_results' in locals() else []
+            'vehicles': final_vehicles
         })
         
-        return response, search_results
+        return response, final_vehicles
     
     def render_chat_interface(self):
         """Render the conversational chat interface."""
@@ -480,8 +607,18 @@ class CarFinderAI:
                     response, vehicles = self.process_message(prompt)
                     st.markdown(response)
                     
-                    # Real-time vehicle display (will be shown via chat history)
-                    st.rerun()
+                    # Display vehicles if any found
+                    if vehicles:
+                        # Show top recommendation
+                        if len(vehicles) > 0:
+                            st.markdown("### 🏆 Top Recommendation")
+                            self.render_vehicle_card(vehicles[0][0], vehicles[0][1])
+                        
+                        # Show other options
+                        if len(vehicles) > 1:
+                            st.markdown("### 🔍 Other Great Options")
+                            for vehicle, score in vehicles[1:5]:  # Show up to 4 more
+                                self.render_vehicle_card(vehicle, score)
     
     def render_sidebar(self):
         """Render sidebar with preferences and controls."""
@@ -519,14 +656,28 @@ class CarFinderAI:
         st.sidebar.markdown("---")
         st.sidebar.markdown("### 📊 Data Sources")
         
-        live_status = "🌐 Enabled" if st.session_state.use_live_data else "📱 Local Only"
-        st.sidebar.markdown(f"**Status:** {live_status}")
+        if st.session_state.use_live_data:
+            live_status = "🟢 **Auto.dev API**"
+            st.sidebar.markdown(f"**Mode:** {live_status}")
+            st.sidebar.caption("Real-time vehicle data")
+        else:
+            live_status = "� **Local Database**"
+            st.sidebar.markdown(f"**Mode:** {live_status}")
+            st.sidebar.caption("Curated sample data")
         
         # Quick stats
         try:
             status = self.vehicle_service.get_data_source_status()
             st.sidebar.metric("Local Vehicles", status['local_database']['vehicle_count'])
-            st.sidebar.metric("Live Sources", status['live_sources']['total_sources'])
+            
+            if st.session_state.use_live_data:
+                st.sidebar.metric("Live Sources", status['live_sources']['total_sources'])
+                # Check if Auto.dev API key is configured
+                if self.config.get('auto_dev_api_key'):
+                    st.sidebar.success("✅ Auto.dev API Ready")
+                else:
+                    st.sidebar.warning("⚠️ Auto.dev API key needed")
+            
         except Exception as e:
             st.sidebar.error(f"Error loading stats: {e}")
 

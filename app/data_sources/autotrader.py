@@ -40,8 +40,56 @@ class AutoTraderAPI(VehicleDataSource):
                        limit: int = 20) -> List[VehicleListing]:
         """Search vehicles on AutoTrader."""
         
-        # Mock data for demonstration
+        # Mock data for demonstration - includes budget options
         mock_listings = [
+            # Budget-friendly options under $15k
+            VehicleListing(
+                source="autotrader",
+                external_id="at_budget_001",
+                make="Chevrolet",
+                model="Cruze",
+                year=2015,
+                price=11200.00,
+                mileage=95000,
+                fuel_type="Gasoline",
+                transmission="Automatic",
+                location="Dallas, TX",
+                safety_rating=4,
+                mpg_city=28,
+                mpg_highway=38,
+                vin="1G1BE5SM4F7123456",
+                description="2015 Chevrolet Cruze - compact sedan with good fuel economy",
+                features=["Bluetooth", "Power Windows", "Air Conditioning", "OnStar"],
+                images=["https://example.com/cruze1.jpg"],
+                dealer_name="Metro Auto Sales",
+                dealer_phone="(555) 444-5555",
+                listing_url="https://www.autotrader.com/cars-for-sale/vehicledetails.xhtml?listingId=budget001",
+                listing_date="2024-10-03"
+            ),
+            VehicleListing(
+                source="autotrader",
+                external_id="at_budget_002",
+                make="Hyundai",
+                model="Elantra",
+                year=2016,
+                price=13500.00,
+                mileage=88000,
+                fuel_type="Gasoline",
+                transmission="Automatic",
+                location="Dallas, TX",
+                safety_rating=5,
+                mpg_city=32,
+                mpg_highway=40,
+                vin="KMHD14JA8GA123456",
+                description="2016 Hyundai Elantra - reliable and fuel-efficient with warranty remaining",
+                features=["Bluetooth", "Backup Camera", "Heated Seats", "Automatic Climate Control"],
+                images=["https://example.com/elantra1.jpg"],
+                dealer_name="Central Hyundai",
+                dealer_phone="(555) 555-6666",
+                listing_url="https://www.autotrader.com/cars-for-sale/vehicledetails.xhtml?listingId=budget002",
+                listing_date="2024-10-02"
+            ),
+            # Higher-end options
             VehicleListing(
                 source="autotrader",
                 external_id="at_001",

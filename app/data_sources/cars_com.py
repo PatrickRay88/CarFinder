@@ -44,8 +44,79 @@ class CarsDotComAPI(VehicleDataSource):
         Note: This is a mock implementation for demonstration.
         """
         
-        # Mock data based on search criteria
+        # Mock data based on search criteria - includes budget-friendly options
         mock_listings = [
+            # Budget-friendly options under $15k
+            VehicleListing(
+                source="cars.com",
+                external_id="cars_budget_001",
+                make="Honda",
+                model="Civic",
+                year=2015,
+                price=12500.00,
+                mileage=85000,
+                fuel_type="Gasoline",
+                transmission="Manual",
+                location="Los Angeles, CA",
+                safety_rating=5,
+                mpg_city=30,
+                mpg_highway=40,
+                vin="2HGFC2F59FH123456",
+                description="Reliable 2015 Honda Civic with great fuel economy. Well maintained.",
+                features=["Bluetooth", "Backup Camera", "Manual Transmission", "Power Windows"],
+                images=["https://example.com/civic1.jpg"],
+                dealer_name="Budget Auto Sales",
+                dealer_phone="(555) 111-2222",
+                listing_url="https://www.cars.com/vehicledetail/budget001",
+                listing_date="2024-10-03"
+            ),
+            VehicleListing(
+                source="cars.com",
+                external_id="cars_budget_002",
+                make="Toyota",
+                model="Corolla",
+                year=2016,
+                price=13800.00,
+                mileage=92000,
+                fuel_type="Gasoline",
+                transmission="CVT",
+                location="Los Angeles, CA",
+                safety_rating=5,
+                mpg_city=32,
+                mpg_highway=41,
+                vin="2T1BURHE8GC123456",
+                description="2016 Toyota Corolla - excellent reliability and fuel economy",
+                features=["Bluetooth", "Backup Camera", "Toyota Safety Sense", "Power Steering"],
+                images=["https://example.com/corolla1.jpg"],
+                dealer_name="Value Motors",
+                dealer_phone="(555) 222-3333",
+                listing_url="https://www.cars.com/vehicledetail/budget002",
+                listing_date="2024-10-02"
+            ),
+            VehicleListing(
+                source="cars.com",
+                external_id="cars_budget_003",
+                make="Nissan",
+                model="Sentra",
+                year=2014,
+                price=9900.00,
+                mileage=110000,
+                fuel_type="Gasoline",
+                transmission="CVT",
+                location="Los Angeles, CA",
+                safety_rating=4,
+                mpg_city=30,
+                mpg_highway=39,
+                vin="3N1AB7AP5EL123456",
+                description="Affordable 2014 Nissan Sentra - perfect first car or daily commuter",
+                features=["Bluetooth", "Power Windows", "Air Conditioning", "CD Player"],
+                images=["https://example.com/sentra1.jpg"],
+                dealer_name="Affordable Auto",
+                dealer_phone="(555) 333-4444",
+                listing_url="https://www.cars.com/vehicledetail/budget003",
+                listing_date="2024-10-01"
+            ),
+            # Mid-range options
             VehicleListing(
                 source="cars.com",
                 external_id="cars_001",

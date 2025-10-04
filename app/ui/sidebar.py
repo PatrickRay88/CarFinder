@@ -107,6 +107,17 @@ def render_sidebar() -> Dict[str, Any]:
     )
     preferences['location'] = location if location else None
     
+    if location:
+        radius = st.sidebar.selectbox(
+            "Search Radius (miles)",
+            options=[25, 50, 100, 200, 500],
+            index=2,  # Default to 100 miles
+            key="pref_radius"
+        )
+        preferences['radius'] = radius
+    else:
+        preferences['radius'] = None
+    
     # Priority weights
     st.sidebar.markdown("### ⚖️ What matters most?")
     st.sidebar.markdown("Rank your priorities:")

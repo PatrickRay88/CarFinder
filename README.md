@@ -1,5 +1,15 @@
 # CarFinder - GenAI Car Shopping Assistant
 
+> ## ⚠️ **DISCLAIMER - INITIAL DEVELOPMENT PHASE**
+> 
+> **This is an early prototype using Ollama for local AI processing.** Currently filtering on limited parameters including vehicle type, price range, mileage, and truck class specifications. Location-based search and advanced filtering features are in development. The AI conversation agent provides basic preference extraction but may not capture all nuanced requirements.
+> 
+> **Known Limitations:**
+> - Basic parameter filtering (make, model, year, price, mileage, truck class)
+> - Location selection not yet implemented in UI (API supports it)
+> - Limited inventory from sample data and Auto.dev API
+> - Ollama LLM responses vary in quality and consistency
+
 # 🚗 CarFinder - AI-Powered Car Shopping Assistant
 
 A complete GenAI car shopping assistant built with Streamlit, featuring RAG-powered search, intelligent recommendations, and conversational AI interface.

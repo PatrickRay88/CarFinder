@@ -39,8 +39,56 @@ class CarGurusAPI(VehicleDataSource):
                        limit: int = 20) -> List[VehicleListing]:
         """Search vehicles on CarGurus."""
         
-        # Mock data showcasing different vehicle types
+        # Mock data showcasing different vehicle types - includes budget options
         mock_listings = [
+            # Budget-friendly options under $15k
+            VehicleListing(
+                source="cargurus",
+                external_id="cg_budget_001",
+                make="Ford",
+                model="Focus",
+                year=2014,
+                price=8900.00,
+                mileage=125000,
+                fuel_type="Gasoline",
+                transmission="Automatic",
+                location="Seattle, WA",
+                safety_rating=4,
+                mpg_city=26,
+                mpg_highway=36,
+                vin="1FADP3K23EL123456",
+                description="2014 Ford Focus - affordable and reliable transportation",
+                features=["Bluetooth", "Power Steering", "Air Conditioning", "AM/FM Radio"],
+                images=["https://example.com/focus1.jpg"],
+                dealer_name="Northwest Auto",
+                dealer_phone="(555) 666-7777",
+                listing_url="https://www.cargurus.com/Cars/inventorylisting/viewDetailsFilterViewInventoryListing.action?sourceContext=carGurusHomePageModel&entitySelectingHelper.selectedEntity=budget001",
+                listing_date="2024-10-03"
+            ),
+            VehicleListing(
+                source="cargurus",
+                external_id="cg_budget_002",
+                make="Kia",
+                model="Forte",
+                year=2017,
+                price=14200.00,
+                mileage=75000,
+                fuel_type="Gasoline",
+                transmission="CVT",
+                location="Seattle, WA",
+                safety_rating=4,
+                mpg_city=31,
+                mpg_highway=41,
+                vin="KNAFK4A61H5123456",
+                description="2017 Kia Forte - low mileage with remaining factory warranty",
+                features=["Backup Camera", "Bluetooth", "USB Port", "Keyless Entry", "Cruise Control"],
+                images=["https://example.com/forte1.jpg"],
+                dealer_name="Pacific Kia",
+                dealer_phone="(555) 777-8888",
+                listing_url="https://www.cargurus.com/Cars/inventorylisting/viewDetailsFilterViewInventoryListing.action?sourceContext=carGurusHomePageModel&entitySelectingHelper.selectedEntity=budget002",
+                listing_date="2024-10-02"
+            ),
+            # Premium options
             VehicleListing(
                 source="cargurus",
                 external_id="cg_001",
