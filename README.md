@@ -170,14 +170,7 @@ CarFinder/
    - Dealer contact information
    - Why each vehicle was recommended
 
-### Manual Search (Alternative)
-1. **Set Preferences**: Use the sidebar for manual input
-   - Budget range and location
-   - Vehicle type and specific requirements
-   - Search radius and other filters
 
-2. **Search**: Click "Search Vehicles" to find matches
-3. **Review Results**: Browse AI-scored and filtered results
 
 ### Tips for Best Results
 - **Be Specific**: "Ford F-150 under $40k" works better than just "truck"
