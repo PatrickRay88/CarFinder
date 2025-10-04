@@ -6,10 +6,14 @@
 > 
 > **Current Capabilities:**
 > - AI conversational search ("find me a reliable truck under $50k")
-> - Live vehicle data from Auto.dev API
+> - Live vehicle data from Auto.dev API (requires free account)
 > - Location-based search with radius selection  
 > - Truck class filtering (1500/2500/3500 specifications)
 > - Natural language preference extraction
+> 
+> **Requirements:**
+> - Auto.dev API key (free account at https://auto.dev/)
+> - Ollama installation for local AI processing
 > 
 > **Known Limitations:**
 > - Ollama LLM responses vary in quality and consistency
@@ -78,11 +82,18 @@ cd CarFinder
 # 2. Run the automated setup
 setup.bat
 
-# 3. Install Ollama and models
+# 3. Get Auto.dev API key
+# Visit https://auto.dev/ and sign up for free
+# Copy your API key from the dashboard
+
+# 4. Create .env file with your API key
+echo AUTO_DEV_API_KEY=your_actual_api_key_here > .env
+
+# 5. Install Ollama and models
 # Download Ollama from https://ollama.ai
 ollama pull llama3.1
 
-# 4. Start the application
+# 6. Start the application
 .\venv\Scripts\Activate.ps1
 python -m streamlit run app/main_live.py
 ```
@@ -94,10 +105,14 @@ python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
-# 2. Install Ollama (https://ollama.ai)
+# 2. Get Auto.dev API key and create .env file
+# Sign up at https://auto.dev/ for your free API key
+echo "AUTO_DEV_API_KEY=your_actual_api_key_here" > .env
+
+# 3. Install Ollama (https://ollama.ai)
 ollama pull llama3.1
 
-# 3. Run the app
+# 4. Run the app
 streamlit run app/main_live.py
 ```
 
@@ -173,24 +188,31 @@ CarFinder/
 ## Configuration
 
 ### Required Setup
+
 1. **Ollama Installation**: Download from https://ollama.ai
 2. **AI Model**: Run `ollama pull llama3.1` to download the language model
-3. **API Access**: Auto.dev API is included and configured
+3. **Auto.dev API Key**: 
+   - Sign up at https://auto.dev/ for free account
+   - Get your API key from the dashboard
+   - Add it to your `.env` file (see below)
 
-### Optional Configuration
-Create a `.env` file for custom settings:
+### Configuration
+
+Create a `.env` file in the project root:
 ```bash
-# Ollama Configuration (defaults work for most setups)
+# Required: Auto.dev API for live vehicle data
+AUTO_DEV_API_KEY=your_auto_dev_api_key_here
+
+# Optional: Ollama Configuration (defaults work for most setups)
 OLLAMA_HOST=http://localhost:11434
 OLLAMA_MODEL=llama3.1
 
-# Search Limits
+# Optional: Search Limits
 MAX_RESULTS=20
 DEFAULT_RADIUS=100  # miles
-
-# Auto.dev API (already configured)
-AUTO_DEV_API_KEY=sk_ad_MHhZ75hvy7XlJDStpPHmdnmP
 ```
+
+**⚠️ Important**: Never commit your `.env` file with real API keys to Git!
 
 ### Performance Notes
 - **Ollama Models**: `llama3.1` (8B) works well for most systems
@@ -206,8 +228,10 @@ AUTO_DEV_API_KEY=sk_ad_MHhZ75hvy7XlJDStpPHmdnmP
 - Start Ollama: It should start automatically, or run `ollama serve`
 - Pull model: `ollama pull llama3.1`
 
-**"No vehicles found"**
-- Check your search criteria (may be too specific)
+**"API Authentication Failed" or "No vehicles found"**
+- Ensure you have a valid Auto.dev API key in your `.env` file
+- Check that your API key is correctly formatted (no extra spaces)
+- Verify your Auto.dev account is active at https://auto.dev/
 - Try a broader location or larger radius
 - Ensure internet connection (needs to access Auto.dev API)
 
