@@ -268,4 +268,19 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
->>>>>>> f1cc058517894ee42448f023bfa19aac90576638
+
+# Large files and executables (GitHub 100MB limit)
+*.exe
+*.msi
+*.dmg
+*.pkg
+*.deb
+*.rpm
+*.zip
+*.tar.gz
+*.rar
+OllamaSetup.*
+
+# CarFinder specific
+test_*.py
+check_*.py
