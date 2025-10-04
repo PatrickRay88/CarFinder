@@ -2,276 +2,245 @@
 
 > ## ⚠️ **DISCLAIMER - INITIAL DEVELOPMENT PHASE**
 > 
-> **This is an early prototype using Ollama for local AI processing.** Currently filtering on limited parameters including vehicle type, price range, mileage, and truck class specifications. Location-based search and advanced filtering features are in development. The AI conversation agent provides basic preference extraction but may not capture all nuanced requirements.
+> **This is an early prototype using Ollama for local AI processing.** The system focuses on AI-powered conversational search rather than manual filtering. Simply chat with the AI about what vehicle you want and it will search live data sources to find matching vehicles.
+> 
+> **Current Capabilities:**
+> - AI conversational search ("find me a reliable truck under $50k")
+> - Live vehicle data from Auto.dev API
+> - Location-based search with radius selection  
+> - Truck class filtering (1500/2500/3500 specifications)
+> - Natural language preference extraction
 > 
 > **Known Limitations:**
-> - Basic parameter filtering (make, model, year, price, mileage, truck class)
-> - Location selection not yet implemented in UI (API supports it)
-> - Limited inventory from sample data and Auto.dev API
 > - Ollama LLM responses vary in quality and consistency
+> - Limited to Auto.dev inventory (expanding to more sources)
+> - AI may not capture highly nuanced or complex requirements
 
 # 🚗 CarFinder - AI-Powered Car Shopping Assistant
 
-A complete GenAI car shopping assistant built with Streamlit, featuring RAG-powered search, intelligent recommendations, and conversational AI interface.
+An AI-powered car shopping assistant that lets you find vehicles through natural conversation. Just tell it what you're looking for and it searches live vehicle listings to find the perfect match.
 
 ![Python](https://img.shields.io/badge/python-v3.8+-blue.svg)
 ![Streamlit](https://img.shields.io/badge/streamlit-v1.50+-red.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
-## ✨ Features
+## ✨ Key Features
 
-### 🤖 **AI-First Experience**
-- **Natural Language Search**: Describe what you want instead of filling forms
-- **Conversational Interface**: Chat with AI to refine and explore options
-- **Contextual Understanding**: AI extracts preferences from casual conversation
+### 🤖 **Conversational AI Search**
+- **Natural Language Interface**: "Find me a reliable truck under $50,000 with low mileage"
+- **Smart Preference Extraction**: AI understands vehicle type, budget, mileage, location preferences
+- **Truck Class Recognition**: Automatically detects 1500/2500/3500 specifications
+- **Interactive Refinement**: Chat to clarify and adjust your requirements
 
-### 🎯 **Intelligent Recommendations**
-- **RAG-Powered Search**: Semantic vehicle matching using custom RAG implementation
-- **Multi-Objective Scoring**: Considers price, reliability, fuel efficiency, safety, and features
-- **Personalized Ranking**: AI learns from your preferences and priorities
+### 🌐 **Live Vehicle Data**
+- **Real-Time Search**: Searches current vehicle listings via Auto.dev API
+- **Location-Based Results**: Find vehicles near you with customizable radius
+- **Fresh Inventory**: Always up-to-date listings from dealers nationwide
+- **Detailed Information**: Price, mileage, location, features, and dealer contact info
 
-### 🎨 **Beautiful Interface**
-- **Card-Based Layout**: Clean, modern vehicle display cards
-- **Prominent Top Choice**: AI's #1 recommendation gets prime visual real estate
-- **Smart Metrics**: Context-aware data presentation with savings indicators
+### 🎯 **AI-Powered Matching**
+- **Compatibility Scoring**: AI rates how well each vehicle matches your needs
+- **Missing Data Handling**: Smart penalties for incomplete listings
+- **Vehicle Type Filtering**: Ensures trucks when you ask for trucks, not sedans
+- **Transparent Results**: See why the AI recommended each vehicle
 
-### 🔧 **Robust Architecture**
-- **Fallback-Friendly**: Graceful degradation when advanced features unavailable
-- **Local Processing**: No external API dependencies for core functionality
-- **SQLite Database**: Lightweight, embedded database with sample vehicle data
+## How It Works
 
-## Features
+1. **Start a Conversation**: Type what kind of vehicle you're looking for
+2. **AI Understands**: The system extracts your preferences (budget, type, location, etc.)
+3. **Live Search**: Searches real-time vehicle listings from multiple sources
+4. **Smart Filtering**: AI filters results and scores compatibility
+5. **Get Results**: See matched vehicles with explanations of why they fit your needs
 
-- **Conversational AI**: Chat with an AI agent about your car needs and preferences
-- **Smart Search**: RAG-powered semantic search through vehicle listings
-- **Personalized Recommendations**: Get a curated shortlist and optimized best pick
-- **Intelligent Agent**: Optional clarification agent to refine your preferences
-- **Safety Focus**: VIN-based recall checks and safety ratings
-- **Cost Analysis**: Total Cost of Ownership (TCO) estimation
-- **Local Privacy**: All AI processing runs locally via Ollama
+**Example Conversations:**
+- "I need a reliable family SUV under $40k"
+- "Find me a Ford F-250 with less than 50,000 miles near Seattle"
+- "Looking for a fuel-efficient car for my commute, budget around $25k"
 
 ## Technology Stack
 
-- **Frontend**: Streamlit
-- **Backend**: FastAPI (optional)
-- **Database**: SQLite with full-text search
-- **Vector Search**: FAISS/Chroma for semantic similarity
-- **Embeddings**: Sentence Transformers (MiniLM/BGE)
-- **LLM**: Llama 3.1 via Ollama (local, privacy-focused)
-- **Agent Framework**: LangGraph for conversational flows
+- **Frontend**: Streamlit with conversational interface
+- **AI/LLM**: Ollama with Llama 3.1 (local, privacy-focused)
+- **Live Data**: Auto.dev API for real-time vehicle listings
+- **Conversation Agent**: Custom preference extraction and natural language processing
+- **Vehicle Matching**: AI-powered compatibility scoring system
+- **Database**: SQLite for local caching (optional)
+- **Location Search**: Geographic radius-based filtering
 
 ## Quick Start
 
-1. **Clone and Setup**
-   ```bash
-   git clone https://github.com/PatrickRay88/CarFinder.git
-   cd CarFinder
-   python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+### Windows Setup
+```bash
+# 1. Clone the repository
+git clone https://github.com/PatrickRay88/CarFinder.git
+cd CarFinder
 
-2. **Install Ollama and Models**
-   ```bash
-   # Install Ollama (see https://ollama.ai)
-   ollama pull llama3.1
-   ollama pull nomic-embed-text  # For embeddings
-   ```
+# 2. Run the automated setup
+setup.bat
 
-3. **Initialize Database**
-   ```bash
-   python scripts/setup_database.py
-   python scripts/ingest_sample_data.py
-   ```
+# 3. Install Ollama and models
+# Download Ollama from https://ollama.ai
+ollama pull llama3.1
 
-4. **Configure Environment**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your settings
-   ```
+# 4. Start the application
+.\venv\Scripts\Activate.ps1
+python -m streamlit run app/main_live.py
+```
 
-5. **Run the Application**
-   ```bash
-   streamlit run app/main.py
-   ```
+### Manual Setup (Any OS)
+```bash
+# 1. Setup Python environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+
+# 2. Install Ollama (https://ollama.ai)
+ollama pull llama3.1
+
+# 3. Run the app
+streamlit run app/main_live.py
+```
+
+**That's it!** Open your browser to the provided URL and start chatting with the AI about what vehicle you want.
 
 ## Project Structure
 
 ```
 CarFinder/
 ├── app/
-│   ├── main.py                 # Streamlit entry point
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── vehicle.py          # Vehicle data models
-│   │   └── database.py         # Database operations
-│   ├── rag/
-│   │   ├── __init__.py
-│   │   ├── embeddings.py       # Text embedding utilities
-│   │   ├── retriever.py        # Vector search and retrieval
-│   │   └── reranker.py         # Optional result reranking
-│   ├── recommendations/
-│   │   ├── __init__.py
-│   │   ├── engine.py           # Recommendation logic
-│   │   └── scoring.py          # Multi-objective scoring
+│   ├── main_live.py            # Main Streamlit app with AI chat
 │   ├── agents/
-│   │   ├── __init__.py
-│   │   ├── conversation.py     # LangGraph conversation flow
-│   │   ├── search_agent.py     # Search orchestration
-│   │   └── clarifier.py        # Preference clarification
+│   │   └── conversation.py     # AI conversation agent & preference extraction
+│   ├── data_sources/
+│   │   ├── auto_dev.py        # Auto.dev API integration
+│   │   ├── aggregator.py      # Multi-source data aggregation
+│   │   └── base.py           # Base data source interface
+│   ├── services/
+│   │   └── vehicle_data.py    # Vehicle search & filtering logic
 │   ├── ui/
-│   │   ├── __init__.py
-│   │   ├── components.py       # Reusable UI components
-│   │   ├── sidebar.py          # Preference input sidebar
-│   │   └── results.py          # Results display
+│   │   ├── components.py      # Chat interface & vehicle cards
+│   │   ├── sidebar.py         # Location & preference inputs
+│   │   └── results.py         # Search results display
 │   └── utils/
-│       ├── __init__.py
-│       ├── config.py           # Configuration management
-│       ├── ollama_client.py    # Ollama integration
-│       └── validators.py       # Input validation
+│       ├── config.py          # Configuration management
+│       └── validators.py      # Input validation
 ├── data/
-│   ├── sample_listings.csv     # Sample vehicle data
-│   ├── safety_ratings.json     # NHTSA safety data
-│   └── recalls.json            # Recall information
+│   └── sample_listings.csv    # Sample data for fallback
 ├── scripts/
-│   ├── setup_database.py       # Database initialization
-│   ├── ingest_data.py          # Data ingestion pipeline
-│   └── update_embeddings.py    # Rebuild vector index
-├── tests/
-│   ├── __init__.py
-│   ├── test_rag.py
-│   ├── test_recommendations.py
-│   └── test_agents.py
-├── config/
-│   ├── __init__.py
-│   └── settings.py             # Application settings
-├── .env.example                # Environment template
-├── .gitignore                  # Git ignore rules
-├── requirements.txt            # Python dependencies
+│   ├── setup_database.py      # Initialize local database
+│   └── ingest_sample_data.py  # Load sample data
+├── setup.bat                  # Windows automated setup
+├── requirements.txt           # Python dependencies
+└── README.md                  # This file
 ├── pytest.ini                 # Test configuration
 └── README.md                   # This file
 ```
 
 ## Usage
 
-### Basic Car Search
-1. Open the Streamlit app
-2. Use the sidebar to set your preferences (budget, make, fuel type, etc.)
-3. View your curated shortlist and optimized best pick
-4. Explore detailed vehicle information and recommendations
+### AI Chat Interface (Recommended)
+1. **Start Chatting**: Type your vehicle needs in the chat box
+   - "I need a reliable pickup truck under $45,000"
+   - "Find me a Honda Civic with less than 30k miles near Chicago"
+   - "Looking for a family SUV, budget around $35k, good safety ratings"
 
-### Conversational Agent Mode
-1. Click "Chat with AI Agent" 
-2. Describe your needs in natural language
-3. The agent will ask clarifying questions to refine your search
-4. Get personalized recommendations with detailed explanations
+2. **AI Processing**: The system automatically:
+   - Extracts your preferences (vehicle type, budget, location, etc.)
+   - Searches live vehicle listings
+   - Filters and scores results for compatibility
 
-### Current Features
-- **Comparison Tool**: Side-by-side vehicle comparisons with detailed metrics
-- **Smart Recommendations**: AI-powered vehicle curation based on preferences
-- **Conversational Interface**: Natural language car shopping assistant
-- **Multi-objective Scoring**: Considers price, reliability, fuel efficiency, safety, and features
+3. **Get Results**: View matched vehicles with:
+   - AI compatibility scores and explanations
+   - Vehicle details (price, mileage, location, features)
+   - Dealer contact information
+   - Why each vehicle was recommended
 
-### Future Improvements
-- **Live Vehicle Data**: Real-time integration with multiple vehicle listing APIs (Cars.com, AutoTrader, CarGurus, etc.)
-- **VIN Lookup**: NHTSA recall checks and detailed vehicle history reports
-- **TCO Calculator**: Comprehensive total cost of ownership analysis including maintenance, insurance, and depreciation
-- **Dealer Integration**: Find nearby dealers, schedule test drives, and get contact information
-- **Enhanced AI**: Ollama integration for more sophisticated conversational capabilities
-- **Market Analytics**: Price trend analysis and market value predictions
-- **Mobile Optimization**: Progressive Web App (PWA) support for mobile devices
+### Manual Search (Alternative)
+1. **Set Preferences**: Use the sidebar for manual input
+   - Budget range and location
+   - Vehicle type and specific requirements
+   - Search radius and other filters
+
+2. **Search**: Click "Search Vehicles" to find matches
+3. **Review Results**: Browse AI-scored and filtered results
+
+### Tips for Best Results
+- **Be Specific**: "Ford F-150 under $40k" works better than just "truck"
+- **Include Location**: "near Seattle" or "within 50 miles of 98101"
+- **Mention Priorities**: "reliable", "fuel efficient", "low mileage", etc.
+- **Ask Follow-ups**: Refine your search with additional requirements
 
 ## Configuration
 
-### Environment Variables (.env)
+### Required Setup
+1. **Ollama Installation**: Download from https://ollama.ai
+2. **AI Model**: Run `ollama pull llama3.1` to download the language model
+3. **API Access**: Auto.dev API is included and configured
+
+### Optional Configuration
+Create a `.env` file for custom settings:
 ```bash
-# Ollama Configuration
+# Ollama Configuration (defaults work for most setups)
 OLLAMA_HOST=http://localhost:11434
 OLLAMA_MODEL=llama3.1
-EMBEDDING_MODEL=nomic-embed-text
 
-# Database
-DATABASE_PATH=data/carfinder.db
-
-# Search Configuration
+# Search Limits
 MAX_RESULTS=20
-SIMILARITY_THRESHOLD=0.7
+DEFAULT_RADIUS=100  # miles
 
-# Optional: External APIs
-NHTSA_API_KEY=your_key_here
-RECALLS_API_ENDPOINT=https://api.nhtsa.gov/recalls
+# Auto.dev API (already configured)
+AUTO_DEV_API_KEY=sk_ad_MHhZ75hvy7XlJDStpPHmdnmP
 ```
 
-### Model Selection Guide
-- **Embeddings**: `nomic-embed-text` (recommended) or `sentence-transformers/all-MiniLM-L6-v2`
-- **LLM**: `llama3.1` (8B parameter, good balance) or `llama3.1:70b` (better quality, requires more resources)
-- **Reranker**: `ms-marco-MiniLM-L-6-v2` for improved search relevance
+### Performance Notes
+- **Ollama Models**: `llama3.1` (8B) works well for most systems
+- **For Better Performance**: Use `llama3.1:70b` if you have 32GB+ RAM
+- **For Lower Resources**: Try `llama3.2` (3B) for faster responses
 
-## Development
+## Troubleshooting
 
-### Adding New Vehicle Data
-1. Place CSV files in `data/` directory
-2. Run `python scripts/ingest_data.py --file your_data.csv`
-3. Update embeddings: `python scripts/update_embeddings.py`
+### Common Issues
 
-### Testing
-```bash
-pytest tests/ -v
-pytest tests/test_rag.py -k "test_semantic_search"
-```
+**"Ollama connection failed"**
+- Install Ollama: Download from https://ollama.ai
+- Start Ollama: It should start automatically, or run `ollama serve`
+- Pull model: `ollama pull llama3.1`
 
-### Database Schema
-```sql
-CREATE TABLE vehicles (
-    id INTEGER PRIMARY KEY,
-    make TEXT NOT NULL,
-    model TEXT NOT NULL,
-    year INTEGER,
-    price REAL,
-    mileage INTEGER,
-    fuel_type TEXT,
-    transmission TEXT,
-    location TEXT,
-    features TEXT,  -- JSON array
-    safety_rating REAL,
-    mpg_city INTEGER,
-    mpg_highway INTEGER,
-    vin TEXT UNIQUE,
-    description TEXT,
-    embedding BLOB,  -- Vector embedding
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+**"No vehicles found"**
+- Check your search criteria (may be too specific)
+- Try a broader location or larger radius
+- Ensure internet connection (needs to access Auto.dev API)
 
-## Security & Privacy
+**"App won't start"**
+- Activate virtual environment: `.\venv\Scripts\Activate.ps1` (Windows)
+- Install dependencies: `pip install -r requirements.txt`
+- Check Python version: Requires Python 3.8+
 
-- **Local-First**: All AI processing via local Ollama installation
-- **No PII Storage**: Vehicle preferences not permanently stored
-- **Input Sanitization**: All user inputs validated and sanitized
-- **Environment Security**: Sensitive configuration in `.env` (not committed)
+**Performance Issues**
+- For faster responses: Use `ollama pull llama3.2` (smaller model)
+- For better quality: Use `ollama pull llama3.1:70b` (if you have 32GB+ RAM)
+- Close other applications to free up system resources
 
-## Contributing
+### Getting Help
+- Check the conversation logs in the Streamlit interface
+- Try rephrasing your vehicle search request
+- Use more specific terms ("Ford F-150" vs "pickup truck")
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature`
-3. Make your changes and add tests
-4. Run tests: `pytest`
-5. Submit a pull request
+## Privacy & Security
+
+- **Local AI**: All AI processing happens on your computer via Ollama
+- **No Personal Data Stored**: Your conversations aren't permanently saved
+- **Live Data**: Vehicle listings come from Auto.dev API (public data)
+- **Open Source**: Full source code available for inspection
 
 ## License
 
 MIT License - see LICENSE file for details.
 
-## Troubleshooting
+## Future Enhancements
 
-### Common Issues
-- **Ollama Connection**: Ensure Ollama is running (`ollama serve`)
-- **Model Not Found**: Pull required models (`ollama pull llama3.1`)
-- **Database Locked**: Close other connections to SQLite database
-- **Memory Issues**: Use smaller models or increase system resources
-
-### Performance Tips
-- Use FAISS for large datasets (>10k vehicles)
-- Enable SQLite WAL mode for concurrent access
-- Cache embeddings to avoid recomputation
-- Use GPU acceleration with Ollama if available
+- **Additional Data Sources**: Integration with Cars.com, AutoTrader, CarGurus
+- **Enhanced AI**: More sophisticated conversation and preference understanding
+- **Mobile App**: Native mobile application
+- **Dealer Integration**: Direct contact and test drive scheduling
+- **Price Alerts**: Notifications when matching vehicles become available
